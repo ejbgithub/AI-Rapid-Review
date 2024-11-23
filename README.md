@@ -1,6 +1,6 @@
-# AI Rapid Review
+# AI Rapid Question Review
 
-**AI Rapid Review** is a fast, private, and cost-free web app that uses AI directly within Google Chrome Canary to rapidly review and master question material without relying on cloud processing.
+**AI Rapid Question Review** is a fast, private, and cost-free web app that uses AI directly within Google Chrome Canary to rapidly review and master question material without relying on cloud processing.
 
 ---
 
