@@ -33,7 +33,7 @@
 
 ## Demo
 
-A live demo is hosted [here](https://ejbgithub/AI-Rapid-Review/)
+A live demo is hosted [here](https://ejbgithub.github.io/AI-Rapid-Review/)
 
 ---
 
