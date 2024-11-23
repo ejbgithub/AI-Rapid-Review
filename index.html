@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapid Review Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        #aiResult {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #4CAF50;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            display: none;
+        }
+        #aiResult p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        #aiResult strong {
+            color: #2e7d32;
+            font-size: 1.2em;
+        }
+        .ai-section {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rapid Review</h1>
+    <button onclick="searchRandomFact()">Random Question</button>
+    <br><br>
+    <label for="arrayIndex">Enter Question ID:</label>
+    <input type="text" id="arrayIndex" />
+    <button onclick="searchFastFacts()">Search</button>
+    
+    <div id="diagnosisSection" style="display: none;">
+        <br><br>
+        (Use Space Bar to Show/Hide Results)
+        <br><br>
+        <label for="userPrompt">What is the diagnosis?</label>
+        <input type="text" id="userPrompt" />
+        <button onclick="submitUserPrompt()" id="submitUserPromptButton">Submit to Google AI</button>
+    </div>
+  
+    <div id="followUpSection" style="display: none;">
+        <br><br>
+        <button onclick="askQuestionAboutMaterial()" id="followUpPromptButton">Ask a question about the material</button>
+    </div>
+  
+    <div id="answerSection" style="display: none;">
+        <br><br>
+        <label for="answerPrompt">Answer the AI question:</label>
+        <input type="text" id="answerPrompt" />
+        <button onclick="submitAnswerToAI()" id="submitAnswerButton">Submit Answer</button>
+    </div>
+  
+    <div id="generalPromptSection" style="display: none;">
+      <br><br>
+      <label for="generalPrompt" id="generalPromptLabel">Ask the AI a general question:</label>
+      <input type="text" id="generalPrompt" />
+      <button onclick="askGeneralQuestion()" id="submitGeneralPromptButton">Submit General Question</button>
+    </div>
+
+    <div id="result" contenteditable="true"></div>
+    <div id="aiResult"></div>    
+
+    <script>
+        var variablesFastFacts = '[{"OrderNumberStep2":"10000","Front":"Pregnant woman presents in third trimester with painless vaginal bleeding; transvaginal ultrasound reveals placental tissue extending over the internal cervical os","Back":"* <b>Placenta previa</b><br><br>Asymptomatic patients (ie, no vaginal bleeding) undergo <b>routine obstetric care</b> and third-trimester ultrasound to evaluate for previa resolution<br><br><b>Cesarean delivery</b> is typically performed at 36-37 weeks gestation<br><br>Often asymptomatic and diagnosed incidentally with ultrasound<br><br><b>Prior cesarean delivery</b> is major risk factor","UWorldStep2QuestionID":"15477, 15476, 2524, 15477, 11969","Tags":["ProfessorPathStep2::EB_Fast_Facts::diagnosis_part1::placenta_previa"]},{"OrderNumberStep2":"10001","Front":"Adult woman presents with lower abdominal pain; ultrasound finds an adnexal mass with absent Doppler flow","Back":"* <b>Ovarian torsion</b><br><br>Next step in management is laparoscopy for detorsion of the adnexa and removal of any contributory adnexal masses<br><br>Cause includes <b>mature cystic teratomas</b> (dermoid cysts)","UWorldStep2QuestionID":"12093","Tags":["ProfessorPathStep2::EB_Fast_Facts::diagnosis_part1::ovarian_torsion"]},{"OrderNumberStep2":"10002","Front":"Woman after intrauterine surgery (eg, suction curettage) presents with amenorrhea and infertility (does not respond to a progesterone challenge)","Back":"* <b>Asherman syndrome</b> (formation of intrauterine adhesions = <b>intrauterine synechiae</b>)","UWorldStep2QuestionID":"15333, 14121","Tags":["ProfessorPathStep2::EB_Fast_Facts::diagnosis_part1::Asherman_syndrome"]}]';
+        
+        var fastFactsArray = JSON.parse(variablesFastFacts);
+
+        function searchFastFacts() {
+            var inputID = document.getElementById("arrayIndex").value.trim();
+            var resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "";
+            if (inputID) {
+                var fact = fastFactsArray.find(fact => fact.UWorldStep2QuestionID.split(', ').includes(inputID));
+                if (fact) {
+                    var analyzingDiv = document.createElement("div");
+                    analyzingDiv.id = "analyzingMessage";
+                    analyzingDiv.innerHTML = "<p style='margin-top: 20px;'>Analyzing...</p>";
+                    analyzingDiv.style.color = "red";
+                    analyzingDiv.style.fontWeight = "bold";
+                    document.body.appendChild(analyzingDiv);
+                    resultDiv.innerHTML = `<p>${fact.Front}</p>`;
+                    handleSelection();
+                } else {
+                    resultDiv.innerHTML = `<p>No match found for UWorldStep2QuestionID: ${inputID}</p>`;
+                }
+            } else {
+                resultDiv.innerHTML = `<p>Please enter a valid UWorldStep2QuestionID number.</p>`;
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.target.tagName.toLowerCase() === 'button' && event.code === 'Space') {
+                event.preventDefault(); // Prevent space bar from activating the button click
+                var aiResultDiv = document.getElementById("aiResult");
+            if (!aiResultDiv) return;
+                if (aiResultDiv.style.display === "none") {
+                    aiResultDiv.style.display = "block";
+                } else {
+                    aiResultDiv.style.display = "none";
+                }
+                return;
+            }
+
+            if (event.target.tagName.toLowerCase() === 'input' || event.target.isContentEditable) {
+                // Ignore space bar events in text boxes or contenteditable elements
+                return;
+            }
+
+            if (event.code === 'Space') {
+                var aiResultDiv = document.getElementById("aiResult");
+                if (!aiResultDiv || aiResultDiv.innerHTML.trim() === "") return;
+                if (aiResultDiv.style.display === "none") {
+                    aiResultDiv.style.display = "block";
+                } else {
+                    aiResultDiv.style.display = "none";
+                }
+            }
+        });
+
+        async function handleSelection() {
+            var inputID = document.getElementById("arrayIndex").value.trim();
+            if (inputID) {
+                var fact = fastFactsArray.find(fact => fact.UWorldStep2QuestionID.split(', ').includes(inputID));
+                if (fact) {
+                    const combinedText = `${fact.Front} ${fact.Back}`;
+                    const { available } = await ai.languageModel.capabilities();
+                    if (available !== "no") {
+                        console.log("Analyzing Data...");
+                        try {
+                            if (!window.currentSession) {
+                                window.currentSession = await ai.languageModel.create();
+                            }
+                            const result = await retryPrompt(window.currentSession, `Based strictly on the information below, what is the diagnosis? Only use the details provided. Please respond strictly in English. ${combinedText}`);
+                            console.log(result);
+                            var aiResultDiv = document.getElementById("aiResult");
+                            if (aiResultDiv) {
+                                aiResultDiv.style.display = "none";
+                                aiResultDiv.innerHTML = marked.parse(result);
+                            }
+                            document.getElementById("generalPromptSection").style.display = "block";
+                        } catch (error) {
+                            if (error.name !== 'AbortError') {
+                                console.error("Error creating session or prompting:", error);
+                            }
+                            var aiResultDiv = document.getElementById("aiResult");
+                            if (aiResultDiv && aiResultDiv.innerHTML.trim() === "") return;
+                            if (aiResultDiv) {
+                                aiResultDiv.style.display = "block";
+                                aiResultDiv.innerHTML = `<p><strong>Error:</strong> Unable to process the request due to internal error. Please try again.</p>`;
+                            }
+                        } finally {
+                            var analyzingMessage = document.getElementById("analyzingMessage");
+                            if (!analyzingMessage) return;
+                            if (analyzingMessage) analyzingMessage.remove();
+                            document.getElementById("diagnosisSection").style.display = "inline";
+                        }
+                    } else {
+                        console.error("AI model not available.");
+                    }
+                }
+            }
+        }
+
+        async function submitUserPrompt() {
+            var analyzingDiv = document.createElement("div");
+            analyzingDiv.id = "analyzingMessage";
+            analyzingDiv.innerHTML = "<p style='margin-top: 20px;'>Analyzing...</p>";
+            analyzingDiv.style.color = "red";
+            analyzingDiv.style.fontWeight = "bold";
+            document.body.appendChild(analyzingDiv);
+            var aiResultDiv = document.getElementById("aiResult");
+            if (aiResultDiv && aiResultDiv.style.display === "block") {
+                aiResultDiv.style.display = "none";
+            }
+            const combinedText = document.getElementById("result").innerText;
+            try {
+                var userPromptElement = document.getElementById("userPrompt");
+            if (!userPromptElement) return;
+            var userPrompt = userPromptElement.value.trim();
+                if (userPrompt) {
+                    if (!window.currentSession) {
+                        window.currentSession = await ai.languageModel.create();
+                    }
+                    const result = await window.currentSession.prompt(`Provide the response in English only. Based strictly on this information: ${combinedText} Is the following diagnosis correct? Diagnosis: ${userPrompt}`);
+                    console.log(result);
+                    aiResultDiv.style.display = "block";
+                    aiResultDiv.innerHTML = marked.parse(result);
+                }
+                document.getElementById("followUpSection").style.display = "inline";
+            } catch (error) {
+                console.error("Error creating session or prompting:", error);
+            } finally {
+                var analyzingMessage = document.getElementById("analyzingMessage");
+                if (analyzingMessage) analyzingMessage.remove();
+            }
+        }
+      
+        async function askQuestionAboutMaterial() {
+            var analyzingDiv = document.createElement("div");
+            analyzingDiv.id = "analyzingMessage";
+            analyzingDiv.innerHTML = "<p style='margin-top: 20px;'>Analyzing...</p>";
+            analyzingDiv.style.color = "red";
+            analyzingDiv.style.fontWeight = "bold";
+            document.body.appendChild(analyzingDiv);
+            var aiResultDiv = document.getElementById("aiResult");
+            if (aiResultDiv && aiResultDiv.style.display === "block") {
+                aiResultDiv.style.display = "none";
+            }
+            try {
+                if (!window.currentSession) {
+                    window.currentSession = await ai.languageModel.create();
+                }
+                const combinedText = document.getElementById("result").innerText;
+                const result = await window.currentSession.prompt(`Ask a relevant question about the following material: ${combinedText}`);
+                console.log(result);
+                var aiResultDiv = document.getElementById("aiResult");
+                if (aiResultDiv) {
+                  aiResultDiv.style.display = "block";
+                }
+                aiResultDiv.innerHTML = marked.parse(result);
+                document.getElementById("answerSection").style.display = "inline";
+            } catch (error) {
+                console.error("Error creating session or prompting:", error);
+            } finally {
+                var analyzingMessage = document.getElementById("analyzingMessage");
+                if (analyzingMessage) analyzingMessage.remove();
+            }
+        }
+      
+        async function submitAnswerToAI() {
+            var analyzingDiv = document.createElement("div");
+            analyzingDiv.id = "analyzingMessage";
+            analyzingDiv.innerHTML = "<p style='margin-top: 20px;'>Analyzing...</p>";
+            analyzingDiv.style.color = "red";
+            analyzingDiv.style.fontWeight = "bold";
+            document.body.appendChild(analyzingDiv);
+            var aiResultDiv = document.getElementById("aiResult");
+            if (aiResultDiv && aiResultDiv.style.display === "block") {
+                aiResultDiv.style.display = "none";
+            }
+            var answerPromptElement = document.getElementById("answerPrompt");
+            if (!answerPromptElement) return;
+            var answerPrompt = answerPromptElement.value.trim();
+            if (answerPrompt) {
+                try {
+                    if (!window.currentSession) {
+                        window.currentSession = await ai.languageModel.create();
+                    }
+                    const combinedText = document.getElementById("result").innerText;
+                    const result = await window.currentSession.prompt(`Given the following material: ${combinedText} The AI has asked the following question: ${answerPrompt} Please provide your response.`);
+                    console.log(result);
+                    aiResultDiv.style.display = "block";
+                    aiResultDiv.innerHTML = marked.parse(result);
+                } catch (error) {
+                    console.error("Error creating session or prompting:", error);
+                } finally {
+                    var analyzingMessage = document.getElementById("analyzingMessage");
+                    if (analyzingMessage) analyzingMessage.remove();
+                }
+            }
+        }
+      
+        async function askGeneralQuestion() {
+            var analyzingDiv = document.createElement("div");
+            analyzingDiv.id = "analyzingMessage";
+            analyzingDiv.innerHTML = "<p style='margin-top: 20px;'>Analyzing...</p>";
+            analyzingDiv.style.color = "red";
+            analyzingDiv.style.fontWeight = "bold";
+            document.body.appendChild(analyzingDiv);
+            var aiResultDiv = document.getElementById("aiResult");
+            if (aiResultDiv && aiResultDiv.style.display === "block") {
+                aiResultDiv.style.display = "none";
+            }
+            var generalPromptElement = document.getElementById("generalPrompt");
+            if (!generalPromptElement) return;
+            var generalPrompt = generalPromptElement.value.trim();
+            if (generalPrompt) {
+                try {
+                    if (!window.currentSession) {
+                        window.currentSession = await ai.languageModel.create();
+                    }
+                    const result = await window.currentSession.prompt(generalPrompt);
+                    console.log(result);
+                    aiResultDiv.style.display = "block";
+                    aiResultDiv.innerHTML = marked.parse(result);
+                } catch (error) {
+                    console.error("Error creating session or prompting:", error);
+                } finally {
+                    var analyzingMessage = document.getElementById("analyzingMessage");
+                    if (analyzingMessage) analyzingMessage.remove();
+                }
+            }
+        }
+
+        function searchRandomFact() {
+            var randomIndex = Math.floor(Math.random() * fastFactsArray.length);
+            var randomFact = fastFactsArray[randomIndex];
+            var randomUWorldID = randomFact.UWorldStep2QuestionID.split(', ')[0];
+            document.getElementById("arrayIndex").value = randomUWorldID;
+            searchFastFacts();
+        }
+
+        async function retryPrompt(session, prompt, retries = 5) {
+            let attempt = 0;
+            while (attempt < retries) {
+                try {
+                    const result = await session.prompt(prompt);
+                    return result;
+                } catch (error) {
+                    console.error("Error on attempt", attempt + 1, ":", error);
+                    if (attempt === retries - 1) throw error;
+                    attempt++;
+                    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retrying
+                }
+            }
+        }
+
+</script>
+  
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>
