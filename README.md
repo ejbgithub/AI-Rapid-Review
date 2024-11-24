@@ -33,19 +33,10 @@
 
 ## Demo
 
-A live demo is hosted [here](https://ejbgithub.github.io/AI-Rapid-Review/)
+A live demo can be accessed [here](https://ejbgithub.github.io/AI-Rapid-Review/), while a YouTube demonstration video can be found [here](https://www.youtube.com/watch?v=edeM2hnZNvA).
 
 ---
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute this project with attribution.
-
----
-
-## Contact
-
-For questions, feedback, or collaboration opportunities, please contact:
-
-- **Name**: Earl Brown, M. D.
-- **Email**: browne@mail.etsu.edu
