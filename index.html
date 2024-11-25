@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapid Review Search</title>
+    <title>AI Rapid Question Review</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,7 +35,7 @@
     </style>
 </head>
 <body>
-    <h1>Rapid Review</h1>
+    <h1>AI Rapid Question Review</h1>
     <button onclick="searchRandomFact()">Random Question</button>
     <br><br>
     <label for="arrayIndex">Enter Question ID:</label>
@@ -143,7 +143,7 @@
                             if (!window.currentSession) {
                                 window.currentSession = await ai.languageModel.create();
                             }
-                            const result = await retryPrompt(window.currentSession, `Based strictly on the information below, what is the diagnosis? Only use the details provided. Please respond strictly in English. ${combinedText}`);
+                            const result = await retryPrompt(window.currentSession, `Based strictly on this information: ${combinedText}, what is the correct diagnosis? Only use the details provided. Please respond strictly in English.`);
                             console.log(result);
                             var aiResultDiv = document.getElementById("aiResult");
                             if (aiResultDiv) {
