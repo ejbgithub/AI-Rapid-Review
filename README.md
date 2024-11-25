@@ -21,10 +21,7 @@
 - No additional software or dependencies are required.
 
 ### How to Use
-1. Clone or download the repository:
-   ```bash
-   git clone https://github.com/ejbgithub/AI-Rapid-Review.git
-
+1. Clone or download the repository or use the live demo link in next section. 
 2. Open index.html in your web browser.
 3. Enter an Question ID Number (if known) or click the Random button to start analyzing the question information.
 4. Interact with the app to ask questions, submit answers, or explore additional material.
