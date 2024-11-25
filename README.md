@@ -17,12 +17,12 @@
 ## Getting Started
 
 ### Prerequisites
-- A modern web browser (Google Chrome Canary is necessary for this demo).
+- A modern web browser (**Google Chrome Canary is necessary for this demo**).
 - No additional software or dependencies are required.
 
 ### How to Use
 1. Clone or download the repository or use the live demo link in next section. 
-2. Open index.html in your web browser.
+2. Open index.html in Google Chrome Canary.
 3. Enter an Question ID Number (if known) or click the Random button to start analyzing the question information.
 4. Interact with the app to ask questions, submit answers, or explore additional material.
 
@@ -30,7 +30,7 @@
 
 ## Demo
 
-A live demo can be accessed [here](https://ejbgithub.github.io/AI-Rapid-Review/), while a YouTube demonstration video can be found [here](https://www.youtube.com/watch?v=edeM2hnZNvA).
+A live demo can be accessed [here](https://ejbgithub.github.io/AI-Rapid-Review/) using Google Chrome Canary, while a YouTube demonstration video can be found [here](https://www.youtube.com/watch?v=edeM2hnZNvA).
 
 ---
 
